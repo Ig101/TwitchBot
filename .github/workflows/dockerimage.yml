@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build and Publish
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+        APP_NAME: ${{ 'capsburg-bot' }}
+      run: |
+        docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
+        heroku config:set ASPNETCORE_ENVIRONMENT=Production -a $APP_NAME
+        heroku config:set MongoConnection__ConnectionString=$MONGO_CONNECTION_STRING -a $APP_NAME
+        heroku container:push web worker -a $APP_NAME --recursive
+        heroku container:release web worker -a $APP_NAME
