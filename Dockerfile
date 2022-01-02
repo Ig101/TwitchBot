@@ -1,5 +1,5 @@
 # Dotnet restore
-FROM mcr.microsoft.com/dotnet/core/sdk:6 AS dotnetBuild
+FROM mcr.microsoft.com/dotnet/core/sdk:6.0 AS dotnetBuild
 WORKDIR /src
 COPY TwitchBot.Web/*.csproj TwitchBot.Web/
 COPY TwitchBot.Application/*.csproj TwitchBot.Application/
@@ -15,7 +15,7 @@ WORKDIR /src/TwitchBot.Web
 RUN dotnet publish -c Release -o /src/publish
 
 # Run
-FROM mcr.microsoft.com/dotnet/core/aspnet:6 AS runtime
+FROM mcr.microsoft.com/dotnet/core/aspnet:6.0 AS runtime
 WORKDIR /app
 COPY --from=publish /src/publish .
 CMD ASPNETCORE_URLS=http://*:$PORT dotnet TwitchBot.Web.dll
