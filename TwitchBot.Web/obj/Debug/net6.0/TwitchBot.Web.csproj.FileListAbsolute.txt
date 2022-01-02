@@ -60,3 +60,5 @@ D:\source\TwitchBot\TwitchBot.Web\bin\Debug\net6.0\runtimes\win\native\snappy64.
 D:\source\TwitchBot\TwitchBot.Web\bin\Debug\net6.0\runtimes\linux\native\libmongocrypt.so
 D:\source\TwitchBot\TwitchBot.Web\bin\Debug\net6.0\runtimes\osx\native\libmongocrypt.dylib
 D:\source\TwitchBot\TwitchBot.Web\bin\Debug\net6.0\runtimes\win\native\mongocrypt.dll
+D:\source\TwitchBot\TwitchBot.Web\bin\Debug\net6.0\TwitchBot.Web.staticwebassets.runtime.json
+D:\source\TwitchBot\TwitchBot.Web\bin\Debug\net6.0\System.Net.WebSockets.WebSocketProtocol.dll

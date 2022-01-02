@@ -4,6 +4,7 @@ using TwitchBot.Domain.Mongo;
 using NLog.Web;
 using TwitchBot.Domain.Db;
 using Microsoft.Extensions.Options;
+using TwitchBot.Domain.AdminHub;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +20,20 @@ builder.Services.AddSingleton<IMongoConnection, MongoConnection>(
         Assembly.GetAssembly(typeof(DbContext)),
         provider.GetRequiredService<IOptions<MongoConnectionSettings>>(),
         provider));
+builder.Services.AddSignalR();
 builder.Services.AddTransient<DbContext>();
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.UseDefaultFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    ServeUnknownFileTypes = true,
+});
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<AdminHub>("/hub");
+});
 
 app.Run();

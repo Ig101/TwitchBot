@@ -14,6 +14,8 @@ using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.SignalR;
+using TwitchBot.Domain.AdminHub;
 
 namespace TwitchBot.Application.Workers
 {
@@ -43,6 +45,7 @@ namespace TwitchBot.Application.Workers
             _logger.LogInformation("started");
             _client.OnMessageReceived += async (sender, e) => {
                 var context = _provider.GetRequiredService<DbContext>();
+                var hub = _provider.GetRequiredService<IHubContext<AdminHub>>();
                 Expression<Func<Current, bool>> condition = (Current x) => x.UserName == e.ChatMessage.UserId;
                 var current = await context.Currents.GetOneAsync(condition, cancellationToken) ?? new Current {
                         Id = Guid.NewGuid(),
@@ -50,7 +53,8 @@ namespace TwitchBot.Application.Workers
                         UserName = e.ChatMessage.UserId
                     };
                 if (e.ChatMessage.Message.Contains("!поток")) {
-                    _client.SendMessage("capsburg", $"Поток болтовни {e.ChatMessage.Username} равен {current.Value}");
+                    await hub.Clients.All.SendAsync("BlueCurrent");
+                  //  _client.SendMessage("capsburg", $"Поток болтовни {e.ChatMessage.Username} равен {current.Value}");
                 } else {
                     current.Value += 1.0;
                     await context.Currents.ReplaceOneAtomicallyAsync(condition, current, true, cancellationToken);
