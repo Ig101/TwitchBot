@@ -1,10 +1,19 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Newtonsoft.Json;
+using TwitchBot.Domain.Db;
+using TwitchBot.Domain.Db.Entities;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
+using System.Linq.Expressions;
 
 namespace TwitchBot.Application.Workers
 {
@@ -29,21 +38,33 @@ namespace TwitchBot.Application.Workers
             _client.Initialize(credentials, "capsburg");
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("started");
-            _client.OnMessageReceived += (sender, e) => {
-                if (e.ChatMessage.Message.Contains("!test1")) {
-                    _client.SendMessage("capsburg", "успешно тест");
+            _client.OnMessageReceived += async (sender, e) => {
+                var context = _provider.GetRequiredService<DbContext>();
+                Expression<Func<Current, bool>> condition = (Current x) => x.UserName == e.ChatMessage.UserId;
+                var current = await context.Currents.GetOneAsync(condition, cancellationToken) ?? new Current {
+                        Id = Guid.NewGuid(),
+                        Value = 0,
+                        UserName = e.ChatMessage.UserId
+                    };
+                if (e.ChatMessage.Message.Contains("!поток")) {
+                    _client.SendMessage("capsburg", $"Поток болтовни {e.ChatMessage.Username} равен {current.Value}");
+                } else {
+                    current.Value += 1.0;
+                    await context.Currents.ReplaceOneAtomicallyAsync(condition, current, true, cancellationToken);
                 }
             };
 
             _client.Connect();
+            return Task.CompletedTask;
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("stopped");
+            return Task.CompletedTask;
         }
     }
 }
