@@ -53,9 +53,17 @@ namespace TwitchBot.Application.Workers
                         UserName = e.ChatMessage.UserId
                     };
                 if (e.ChatMessage.Message.Contains("!поток")) {
-                    await hub.Clients.All.SendAsync("BlueCurrent");
-                  //  _client.SendMessage("capsburg", $"Поток болтовни {e.ChatMessage.Username} равен {current.Value}");
-                } else {
+                    _client.SendMessage("capsburg", $"Поток болтовни {e.ChatMessage.Username} равен {current.Value}");
+                }
+                else if (e.ChatMessage.Message.Contains("!минус поток"))
+                {
+                    if (current.Value >= 10.0) {
+                        await hub.Clients.All.SendAsync("BlueCurrent");
+                        current.Value -= 10.0;
+                        await context.Currents.ReplaceOneAtomicallyAsync(condition, current, true, cancellationToken);
+                    }
+                }
+                else {
                     current.Value += 1.0;
                     await context.Currents.ReplaceOneAtomicallyAsync(condition, current, true, cancellationToken);
                 }
