@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "uB/4GS2e6OaW63XHOAkNVnawK8xOm8NNwwKKaIVQl1c=",
+  "Source": "TwitchBot.Web",
+  "BasePath": "_content/TwitchBot.Web",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

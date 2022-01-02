@@ -1,0 +1,12 @@
+D:\source\TwitchBot\TwitchBot.Domain\bin\Debug\net6.0\TwitchBot.Domain.deps.json
+D:\source\TwitchBot\TwitchBot.Domain\bin\Debug\net6.0\TwitchBot.Domain.dll
+D:\source\TwitchBot\TwitchBot.Domain\bin\Debug\net6.0\ref\TwitchBot.Domain.dll
+D:\source\TwitchBot\TwitchBot.Domain\bin\Debug\net6.0\TwitchBot.Domain.pdb
+D:\source\TwitchBot\TwitchBot.Domain\obj\Debug\net6.0\TwitchBot.Domain.csproj.AssemblyReference.cache
+D:\source\TwitchBot\TwitchBot.Domain\obj\Debug\net6.0\TwitchBot.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\source\TwitchBot\TwitchBot.Domain\obj\Debug\net6.0\TwitchBot.Domain.AssemblyInfoInputs.cache
+D:\source\TwitchBot\TwitchBot.Domain\obj\Debug\net6.0\TwitchBot.Domain.AssemblyInfo.cs
+D:\source\TwitchBot\TwitchBot.Domain\obj\Debug\net6.0\TwitchBot.Domain.csproj.CoreCompileInputs.cache
+D:\source\TwitchBot\TwitchBot.Domain\obj\Debug\net6.0\TwitchBot.Domain.dll
+D:\source\TwitchBot\TwitchBot.Domain\obj\Debug\net6.0\ref\TwitchBot.Domain.dll
+D:\source\TwitchBot\TwitchBot.Domain\obj\Debug\net6.0\TwitchBot.Domain.pdb
