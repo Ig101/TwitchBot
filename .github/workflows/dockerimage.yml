@@ -18,10 +18,12 @@ jobs:
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         APP_NAME: ${{ 'capsburg-bot' }}
       run: |
         docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
         heroku config:set ASPNETCORE_ENVIRONMENT=Production -a $APP_NAME
         heroku config:set MongoConnection__ConnectionString=$MONGO_CONNECTION_STRING -a $APP_NAME
+        heroku config:set BotToken=$BOT_TOKEN -a $APP_NAME
         heroku container:push web -a $APP_NAME --recursive
         heroku container:release web -a $APP_NAME

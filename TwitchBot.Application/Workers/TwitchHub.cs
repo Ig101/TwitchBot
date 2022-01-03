@@ -16,6 +16,8 @@ using TwitchLib.Communication.Models;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.SignalR;
 using TwitchBot.Domain.AdminHub;
+using TwitchBot.Domain.Enums;
+using Microsoft.Extensions.Configuration;
 
 namespace TwitchBot.Application.Workers
 {
@@ -24,17 +26,19 @@ namespace TwitchBot.Application.Workers
         private readonly IServiceProvider _provider;
         private readonly ILogger<TwitchHub> _logger;
         private TwitchClient _client;
+        private readonly IConfiguration _configuration;
 
-        public TwitchHub(IServiceProvider provider, ILogger<TwitchHub> logger)
+        public TwitchHub(IServiceProvider provider, ILogger<TwitchHub> logger, IConfiguration configuration)
         {
+            _configuration = configuration;
             _provider = provider;
             _logger = logger;
-            var credentials = new ConnectionCredentials("capsburgbot", "oauth:90b1m2yyokiofbymk5ofkcnghnyzed");
+            var credentials = new ConnectionCredentials("capsburgbot", _configuration["BotToken"]);
             var clientOptions = new ClientOptions
-                {
-                    MessagesAllowedInPeriod = 750,
-                    ThrottlingPeriod = TimeSpan.FromSeconds(30)
-                };
+            {
+                MessagesAllowedInPeriod = 750,
+                ThrottlingPeriod = TimeSpan.FromSeconds(30)
+            };
             var customClient = new WebSocketClient(clientOptions);
             _client = new TwitchClient(customClient);
             _client.Initialize(credentials, "capsburg");
@@ -43,27 +47,32 @@ namespace TwitchBot.Application.Workers
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("started");
-            _client.OnMessageReceived += async (sender, e) => {
+            _client.OnMessageReceived += async (sender, e) =>
+            {
                 var context = _provider.GetRequiredService<DbContext>();
                 var hub = _provider.GetRequiredService<IHubContext<AdminHub>>();
-                Expression<Func<Current, bool>> condition = (Current x) => x.UserName == e.ChatMessage.UserId;
-                var current = await context.Currents.GetOneAsync(condition, cancellationToken) ?? new Current {
-                        Id = Guid.NewGuid(),
-                        Value = 0,
-                        UserName = e.ChatMessage.UserId
-                    };
-                if (e.ChatMessage.Message.Contains("!поток")) {
+                Expression<Func<Current, bool>> condition = (Current x) => x.UserName == e.ChatMessage.Username && x.Type == CurrentType.Blue;
+                var current = await context.Currents.GetOneAsync(condition, cancellationToken) ?? new Current
+                {
+                    Id = Guid.NewGuid(),
+                    Value = 0,
+                    UserName = e.ChatMessage.Username
+                };
+                if (e.ChatMessage.Message == "!поток")
+                {
                     _client.SendMessage("capsburg", $"Поток болтовни {e.ChatMessage.Username} равен {current.Value}");
                 }
-                else if (e.ChatMessage.Message.Contains("!минус поток"))
+                else if (e.ChatMessage.Message == "!высвободить")
                 {
-                    if (current.Value >= 10.0) {
+                    if (current.Value >= 10.0)
+                    {
                         await hub.Clients.All.SendAsync("BlueCurrent");
                         current.Value -= 10.0;
                         await context.Currents.ReplaceOneAtomicallyAsync(condition, current, true, cancellationToken);
                     }
                 }
-                else {
+                else
+                {
                     current.Value += 1.0;
                     await context.Currents.ReplaceOneAtomicallyAsync(condition, current, true, cancellationToken);
                 }

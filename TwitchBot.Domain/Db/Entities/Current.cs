@@ -1,5 +1,6 @@
 using System;
 using MongoDB.Bson.Serialization.Attributes;
+using TwitchBot.Domain.Enums;
 
 namespace TwitchBot.Domain.Db.Entities
 {
@@ -13,5 +14,8 @@ namespace TwitchBot.Domain.Db.Entities
 
         [BsonElement("s")]
         public double Value { get; set; }
+        
+        [BsonElement("t")]
+        public CurrentType Type { get; set; }
     }
 }
